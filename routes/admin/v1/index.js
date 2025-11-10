@@ -1,0 +1,21 @@
+import adminAuthRoute from "./auth-route.js";
+import categoryRoute from "./category-routes.js";
+import mainCategoryRoute from "./main-category-routes.js";
+import productRoute from "./product-routes.js";
+import settingRoute from "./setting.route.js";
+import couponRoute from "./coupon-routes.js";
+import vendorRoute from "./vendor.route.js";
+import countryRoute from "./address/country.routes.js";
+import stateRoute from "./address/state.routes.js";
+import cityRoute from "./address/city.routes.js";
+
+export { adminAuthRoute };
+export { categoryRoute };
+export { mainCategoryRoute};
+export { productRoute};
+export { settingRoute};
+export { couponRoute};
+export { vendorRoute};
+export { countryRoute};
+export { stateRoute};
+export { cityRoute};
