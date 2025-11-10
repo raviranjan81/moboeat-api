@@ -6,12 +6,14 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
-} from "../../../controller/adminstaff/v1/product-controller.js";
+} from "../../../controller/adminStaff/v1/product-controller.js";
+
 import {
   productSchema,
   productListSchema,
-} from "../../../schema/adminstaff/v1/product.schema.js";
-import { verifyToken } from "../../../middleware/adminstaff/adminstaff-auth-request.js";
+} from "../../../schema/adminStaff/v1/product.schema.js";
+
+import { verifyToken } from "../../../middleware/adminStaff/adminstaff-auth-request.js";
 
 
 const router = express.Router();

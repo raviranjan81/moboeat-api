@@ -5,11 +5,13 @@ import path from "path";
 
 import { generateToken } from "../../../utils/jwt.js";
 import { removeImageBackground } from "../../../utils/remove-background.js";
+const OTP_EXPIRY_TIME = 5 * 60 * 1000;
 
 export const sendOtp = async (req, res, next) => {
+  
   try {
     const { mobile } = req.body;
-    const otp = 123456;
+    const otp = 1234;
     await sendSms(otp, mobile);
     const otpExpiry = new Date(Date.now() + OTP_EXPIRY_TIME);
 
@@ -20,12 +22,15 @@ export const sendOtp = async (req, res, next) => {
     admin.otp = otp.toString();
     admin.otpExpiry = otpExpiry;
     await admin.save();
-    res.json({
+
+   return res.json({
       response: true,
       otp: otp,
       message: "Otp sent to your mobile no.",
     });
   } catch (error) {
+    console.log(error.message);
+    
     return next(new AppError("Something went wrong", 500));
   }
 };

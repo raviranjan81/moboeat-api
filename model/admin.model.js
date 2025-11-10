@@ -90,7 +90,7 @@ const adminSchema = new Schema(
     },
      contactPerson: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
      userId: {

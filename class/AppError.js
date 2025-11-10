@@ -13,7 +13,7 @@ export const errorHandler = (err, req, res, next) => {
 
     if (process.env.NODE_ENV === 'local') {
         return res.status(statusCode).json({
-            success: false,
+            response: false,
             message: err.message,
             stack: err.stack,
             error: err,
@@ -22,13 +22,13 @@ export const errorHandler = (err, req, res, next) => {
 
     if (err.isOperational) {
         return res.status(statusCode).json({
-            success: false,
+            response: false,
             message: err.message,
         });
     } else {
         console.error(err);
         return res.status(500).json({
-            success: false,
+            response: false,
             message: 'Something went wrong on the server',
         });
     }

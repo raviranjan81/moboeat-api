@@ -677,8 +677,12 @@ export const getOrderDetails = async (req, res, next) => {
     const order = await OrderModel.findOne({ _id: orderId })
       .populate("userId", "name email mobile address")
       .populate({
-        path: "products.productId", 
+        path: "products.productId.vendorId", 
         select: "name image price description",
+      })
+      .populate({
+        path: "products.vendorId", 
+        select: "name ",
       })
       .lean();
 

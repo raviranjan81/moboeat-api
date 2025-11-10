@@ -106,9 +106,11 @@ export const getUserProducts = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
+  console.log(req.body);
+
   try {
-    // ✅ Handle both POST and GET (req.body or req.query)
-    const input = req.body && Object.keys(req.body).length ? req.body : req.query || {};
+    const input =
+      req.body && Object.keys(req.body).length ? req.body : req.query || {};
 
     const {
       page = 1,
@@ -123,6 +125,8 @@ export const getProducts = async (req, res, next) => {
       selectedMainCategories = [],
       priceRange = { min: 0, max: 999999 },
       search = "",
+      itemCategories = [],
+      foodTypes = [],
     } = filters;
 
     const vendorId = req.params?.vendorId ?? req.params?.id;
@@ -132,6 +136,7 @@ export const getProducts = async (req, res, next) => {
         message: "Vendor ID is required",
       });
     }
+   
 
     const now = new Date();
     const currentHHMM = `${now.getHours().toString().padStart(2, "0")}:${now
@@ -139,7 +144,6 @@ export const getProducts = async (req, res, next) => {
       .toString()
       .padStart(2, "0")}`;
 
-    // ✅ Fetch selected main categories (by name)
     const mainCategories = await MainCategoryModel.find(
       selectedMainCategories.length
         ? { name: { $in: selectedMainCategories } }
@@ -154,6 +158,14 @@ export const getProducts = async (req, res, next) => {
       finalPrice: { $gte: priceRange.min, $lte: priceRange.max },
     };
 
+     if (itemCategories.length) {
+      query.itemCategory = { $in: itemCategories };
+    }
+
+    if (foodTypes.length) {
+      query.food_type = { $in: foodTypes };
+    }
+
     if (mainCategoryIds.length) query.mainCategory = { $in: mainCategoryIds };
 
     if (search && search.trim()) {
@@ -165,13 +177,11 @@ export const getProducts = async (req, res, next) => {
       ];
     }
 
-    // ✅ Sorting
     const sortOptions = { [sortField]: sortOrder === "asc" ? 1 : -1 };
 
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
-    // ✅ Fetch products
     const [totalItems, products] = await Promise.all([
       ProductModel.countDocuments(query),
       ProductModel.find(query)
@@ -182,7 +192,6 @@ export const getProducts = async (req, res, next) => {
         .lean(),
     ]);
 
-    // ✅ Check category time for availability
     const finalProducts = products.map((product) => {
       const mc = product.mainCategory;
       let is_available = true;
@@ -195,12 +204,23 @@ export const getProducts = async (req, res, next) => {
       return { ...product, is_available };
     });
 
-    // ✅ Send response
+    const allVendorProducts = await ProductModel.find({ vendorId }).lean();
+
+    const uniqueItemCategories = [
+      ...new Set(allVendorProducts.map((p) => p.itemCategory).filter(Boolean)),
+    ];
+
+    const uniqueFoodTypes = [
+      ...new Set(allVendorProducts.map((p) => p.food_type).filter(Boolean)),
+    ];
+
     return res.status(200).json({
       response: true,
       message: "Products fetched successfully",
       data: {
         products: finalProducts,
+        uniqueItemCategories,
+        uniqueFoodTypes,
         pagination: paginate
           ? {
               page: pageNumber,
@@ -216,9 +236,8 @@ export const getProducts = async (req, res, next) => {
     next(error);
   }
 };
+
 export const getProducts2 = async (req, res, next) => {
-
-
   try {
     const {
       page = 1,
@@ -236,14 +255,13 @@ export const getProducts2 = async (req, res, next) => {
     } = filters;
 
     console.log(req?.body);
-    
-    const  vendorId  = req?.params?.id;
+
+    const vendorId = req?.params?.id;
     if (!vendorId) {
       return res
         .status(400)
         .json({ response: false, message: "Vendor ID is required" });
     }
-    
 
     const currentTime = new Date();
     const currentHHMM = `${currentTime
@@ -259,7 +277,6 @@ export const getProducts2 = async (req, res, next) => {
         ? { name: { $in: selectedMainCategories } }
         : {}
     ).lean();
-    
 
     const mainCategoryIds = mainCategories.map((cat) => cat._id);
 
@@ -325,5 +342,29 @@ export const getProducts2 = async (req, res, next) => {
   } catch (error) {
     console.error("❌ getProducts error:", error.message);
     next(error);
+  }
+};
+export const getProductFilters = async (req, res) => {
+  try {
+    const vendorId = req.params.vendorId;
+
+    const foodTypes = await ProductModel.distinct("food_type", {
+      vendorId,
+      status: "Active",
+    });
+    const itemCategories = await ProductModel.distinct("itemCategory", {
+      vendorId,
+      status: "Active",
+    });
+
+    return res.status(200).json({
+      response: true,
+      data: {
+        foodTypes: foodTypes.filter(Boolean),
+        itemCategories: itemCategories.filter(Boolean),
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ response: false, message: err.message });
   }
 };

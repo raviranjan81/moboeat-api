@@ -32,7 +32,6 @@ export const orderCreationSchema = z.object({
   subtotal: z.number().min(0, "Subtotal must be a positive number"),
   shippingCharges: z.number().default(0),
   couponCode: z.string().optional(),
-  address: addressSchema,
   notes: z.string().optional(),
 });
 const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId");

@@ -24,8 +24,6 @@ const userSchema = new Schema(
       ref: "State",
     },
 
-  
-
     corporateCode: {
       type: String,
       required: true,
@@ -37,15 +35,6 @@ const userSchema = new Schema(
       required: true,
       match: /^[0-9]{10}$/,
       trim: true,
-    },
-
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      unique: true,
-      trim: true,
-      match: /.+\@.+\..+/,
     },
 
     logo: {

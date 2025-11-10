@@ -14,16 +14,6 @@ export const registerSchema = z.object({
     .regex(/^[0-9]{10}$/, "Mobile number must be 10 digits")
     .openapi({ example: "9876543210" }),
 
-  email: z
-    .string({ required_error: "Email is required" })
-    .email("Invalid email format")
-    .openapi({ example: "john@example.com" }),
-
-  password: z
-    .string({ required_error: "Password is required" })
-    .min(6, "Password must be at least 6 characters long")
-    .openapi({ example: "secret123" }),
-
   countryId: z
     .string()
     .optional()
@@ -56,9 +46,9 @@ export const loginSchema = z
 
     otp: z
       .string()
-      .regex(/^[0-9]{6}$/, "OTP must be 6 digits")
+      .regex(/^[0-9]{4}$/, "OTP must be 6 digits")
       .optional()
-      .openapi({ example: "123456" }),
+      .openapi({ example: "1234" }),
 
     password: z
       .string()
